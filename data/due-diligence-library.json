@@ -1,0 +1,105 @@
+{
+  "syncedAt": "2026.08.24",
+  "documentCount": 11,
+  "documents": [
+    {
+      "title": "【空间装备研究分院-2025年第59期-总77期】商业航天全产业链企业尽职调查清单",
+      "file": "pdf/【空间装备研究分院-2025年第59期-总77期】商业航天全产业链企业尽职调查清单.pdf",
+      "type": "尽调清单",
+      "industry": "其他行业",
+      "size": 538140,
+      "sha256": "f031ec264574e3874cd8ee19d93ee46ff26fbd61c06a773fd043645628d63da2",
+      "modifiedAt": "2026-08-21T02:44:37.800Z"
+    },
+    {
+      "title": "【智能制造】具身智能行业营销话术",
+      "file": "pdf/【智能制造】具身智能行业营销话术.pdf",
+      "type": "营销话术",
+      "industry": "高端制造",
+      "size": 380892,
+      "sha256": "1f4a8b9e413d3b136c4569fab9e2d3ed9a8ca5d425a35bc3bf911a04315b77bc",
+      "modifiedAt": "2026-08-21T02:44:40.282Z"
+    },
+    {
+      "title": "创新药赛道营销话术",
+      "file": "pdf/创新药赛道营销话术.pdf",
+      "type": "营销话术",
+      "industry": "生物医药",
+      "size": 240608,
+      "sha256": "d74a2658721147f717e62830595a8202950c4683711e7044da314ba3e69202a8",
+      "modifiedAt": "2026-08-21T02:44:39.094Z"
+    },
+    {
+      "title": "高值耗材行业准入条件清单",
+      "file": "pdf/高值耗材行业准入条件清单.pdf",
+      "type": "尽调清单",
+      "industry": "生物医药",
+      "size": 893422,
+      "sha256": "dc1f4c9df5a03440ac63544838014cbd976748b6370ebc620dde8a9ae9230409",
+      "modifiedAt": "2026-08-21T02:44:38.380Z"
+    },
+    {
+      "title": "核药尽调清单",
+      "file": "pdf/核药尽调清单.pdf",
+      "type": "尽调清单",
+      "industry": "生物医药",
+      "size": 139189,
+      "sha256": "ed42fa5a0da96f154af51dbcdcbd1fc4d6a69648019170dcc654c42f1f1b15e5",
+      "modifiedAt": "2026-08-21T02:44:37.322Z"
+    },
+    {
+      "title": "尽调问题清单（高值耗材行业）",
+      "file": "pdf/尽调问题清单（高值耗材行业）.pdf",
+      "type": "尽调清单",
+      "industry": "生物医药",
+      "size": 360992,
+      "sha256": "b0bca8f72b38b43ae64cbebccac6789a3dcc8dd2f7cdde8ab4b305dc6ad726f0",
+      "modifiedAt": "2026-08-21T02:44:38.897Z"
+    },
+    {
+      "title": "具身智能全产业链企业尽职调查清单",
+      "file": "pdf/具身智能全产业链企业尽职调查清单.pdf",
+      "type": "尽调清单",
+      "industry": "人工智能",
+      "size": 373246,
+      "sha256": "60cf4260e89188c16902181361ad2c2221c8af50fc34fec445ff1b776427788a",
+      "modifiedAt": "2026-08-21T02:44:37.099Z"
+    },
+    {
+      "title": "生物制造企业现场营销拜访指南",
+      "file": "pdf/生物制造企业现场营销拜访指南.pdf",
+      "type": "营销话术",
+      "industry": "生物医药",
+      "size": 117253,
+      "sha256": "1d90e754b1d8773006d2847105c160c3bd8ff64b4bb57d73169a9d1ff2fbe24e",
+      "modifiedAt": "2026-08-21T02:44:39.260Z"
+    },
+    {
+      "title": "医养结合机构尽调问题清单",
+      "file": "pdf/医养结合机构尽调问题清单.pdf",
+      "type": "尽调清单",
+      "industry": "生物医药",
+      "size": 307701,
+      "sha256": "ac91517e1e10e17e75a64191e72e81a14a3a47b676432fa7a1d940335367c810",
+      "modifiedAt": "2026-08-24T09:11:56.077Z"
+    },
+    {
+      "title": "制药设备赛道营销话术",
+      "file": "pdf/制药设备赛道营销话术.pdf",
+      "type": "营销话术",
+      "industry": "生物医药",
+      "size": 287106,
+      "sha256": "f4ae01bd0e3ee6b61466edbbb49bb18625aa8662d6cb1c0a532345ee7d284546",
+      "modifiedAt": "2026-08-21T02:44:40.408Z"
+    },
+    {
+      "title": "CXO赛道营销话术",
+      "file": "pdf/CXO赛道营销话术.pdf",
+      "type": "营销话术",
+      "industry": "生物医药",
+      "size": 309312,
+      "sha256": "d2db056a460099427ba97b80dbb9b1ff834fefdc56ab9fa6f4a94fdd34700835",
+      "modifiedAt": "2026-08-21T02:44:40.043Z"
+    }
+  ]
+}

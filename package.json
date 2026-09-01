@@ -1,0 +1,18 @@
+{
+  "name": "csj-insight-portal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate.mjs",
+    "live-center:check": "python scripts/sync_live_center.py --check",
+    "live-center:sync": "python scripts/sync_live_center.py",
+    "due-diligence:check": "node scripts/sync_due_diligence_library.mjs --check",
+    "due-diligence:sync": "node scripts/sync_due_diligence_library.mjs",
+    "test": "npm run due-diligence:check && npm run build && npm run validate"
+  }
+}

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雷达扫描 - 合作上市公司</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a151a;
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      color: #9ccc65;
+    }
+
+    #radar-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(20, 45, 50, 0.6) 0%, rgba(10, 21, 26, 1) 75%),
+        linear-gradient(rgba(139, 195, 74, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 195, 74, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+    }
+
+    /* 扫描角标 */
+    .corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border: 2px solid #aed581;
+      opacity: 0.7;
+    }
+    .corner.tl {
+      top: 24px;
+      left: 24px;
+      border-right: none;
+      border-bottom: none;
+      box-shadow: inset 4px 4px 8px rgba(174, 213, 129, 0.15);
+    }
+    .corner.br {
+      bottom: 24px;
+      right: 24px;
+      border-left: none;
+      border-top: none;
+      box-shadow: inset -4px -4px 8px rgba(174, 213, 129, 0.15);
+    }
+
+    /* 状态文字 */
+    .status {
+      position: absolute;
+      left: 28px;
+      top: 70px;
+      z-index: 20;
+      pointer-events: none;
+      padding: 12px 16px;
+      background: rgba(10, 21, 26, 0.72);
+      border-left: 2px solid rgba(174, 213, 129, 0.45);
+      border-radius: 2px;
+      backdrop-filter: blur(2px);
+    }
+    .status-line {
+      font-size: 14px;
+      line-height: 1.7;
+      letter-spacing: 0.08em;
+      color: rgba(174, 213, 129, 0.75);
+      text-transform: uppercase;
+    }
+    .status-line.main {
+      font-size: 18px;
+      color: #c5e1a5;
+      text-shadow: 0 0 10px rgba(197, 225, 165, 0.35);
+      margin-bottom: 6px;
+    }
+
+    /* 公司名称层 */
+    #company-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .company-name {
+      position: absolute;
+      font-size: 13px;
+      line-height: 1;
+      color: #6b8f55;
+      opacity: 0.11;
+      white-space: nowrap;
+      transition: opacity 0.9s ease, color 0.5s ease, text-shadow 0.5s ease, transform 0.5s ease;
+      text-shadow: 0 0 0 transparent;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .company-name.active {
+      opacity: 1;
+      color: #dcedc8;
+      text-shadow:
+        0 0 8px rgba(168, 224, 99, 0.85),
+        0 0 18px rgba(168, 224, 99, 0.5);
+      transform: translate(-50%, -50%) scale(1.12);
+      z-index: 15;
+    }
+
+    /* 雷达主体 */
+    #radar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(70vw, 70vh);
+      height: min(70vw, 70vh);
+      max-width: 620px;
+      max-height: 620px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      z-index: 10;
+    }
+
+    .axis {
+      position: absolute;
+      background: rgba(139, 195, 74, 0.22);
+    }
+    .axis.h {
+      width: 100%;
+      height: 1px;
+      top: 50%;
+      left: 0;
+    }
+    .axis.v {
+      width: 1px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+    }
+
+    .ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(139, 195, 74, 0.22);
+      border-radius: 50%;
+    }
+    .ring.r1 { width: 33%; height: 33%; }
+    .ring.r2 { width: 66%; height: 66%; }
+    .ring.r3 { width: 100%; height: 100%; }
+
+    .sweep-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0deg,
+        rgba(139, 195, 74, 0.18) 18deg,
+        rgba(168, 224, 99, 0.06) 36deg,
+        transparent 48deg
+      );
+      transform: rotate(0deg);
+      pointer-events: none;
+    }
+
+    .sweep-line {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      transform-origin: 0 50%;
+      transform: rotate(0deg);
+      background: linear-gradient(
+        90deg,
+        rgba(197, 225, 165, 0.95) 0%,
+        rgba(139, 195, 74, 0.5) 45%,
+        rgba(139, 195, 74, 0.1) 80%,
+        transparent 100%
+      );
+      box-shadow: 0 0 10px rgba(168, 224, 99, 0.4);
+      border-radius: 1px;
+      pointer-events: none;
+    }
+
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      transform: translate(-50%, -50%);
+      background: rgba(168, 224, 99, 0.9);
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(168, 224, 99, 0.6);
+    }
+
+    /* 装饰脉冲点 */
+    .pulse-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff7043;
+      box-shadow: 0 0 12px rgba(255, 112, 67, 0.7);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 12;
+    }
+    .pulse-dot.active {
+      opacity: 1;
+      animation: pulse-ring 1.4s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 112, 67, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); }
+    }
+
+    /* portal integration pass: keep the scan panel clear of the host hero copy */
+    .status { left: 24px; top: 28px; padding: 8px 12px; max-width: 265px; }
+    .status-line { font-size: 10px; line-height: 1.45; letter-spacing: .06em; }
+    .status-line.main { font-size: 14px; margin-bottom: 3px; }
+    .company-name { font-size: 10px; }
+    .company-name.active { transform: translate(-50%, -50%) scale(1.06); }
+    @media (max-width: 650px) {
+      #radar { width: min(84vw, 390px); height: min(84vw, 390px); }
+      .status { left: 13px; top: 14px; max-width: 185px; padding: 5px 8px; }
+      .status-line { font-size: 7px; }
+      .status-line.main { font-size: 10px; }
+      .company-name { font-size: 5.8px; }
+      .company-name.active { transform: translate(-50%, -50%) scale(1.03); }
+      .radar-label { font-size: 7px; left: 13px; bottom: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="radar-container">
+    <div class="corner tl"></div>
+    <div class="corner br"></div>
+
+    <div class="status">
+      <div class="status-line main">SCANNING: YANGTZE DELTA</div>
+      <div class="status-line">RANGE 04 / SIGNAL LOCKED</div>
+      <div class="status-line" id="pulse-count">0 ACTIVE PULSES DETECTED</div>
+    </div>
+
+    <div id="company-layer"></div>
+
+    <div id="radar">
+      <div class="axis h"></div>
+      <div class="axis v"></div>
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="sweep-glow" id="sweep-glow"></div>
+      <div class="sweep-line" id="sweep-line"></div>
+      <div class="center"></div>
+    </div>
+  </div>
+
+  <script>
+    const companies = [
+      "派斯林", "巨化股份", "中伟新材", "阳光电源", "南风股份", "浙农股份",
+      "康达新材", "天山铝业", "金固股份", "润邦股份", "凯德石英", "晶澳科技",
+      "格林美", "天能股份", "恒星科技", "亚虹医药", "天邦食品", "浙商中拓",
+      "共进股份", "风范股份", "卧龙电驱", "铜陵有色", "晶科科技", "城投控股",
+      "万华化学", "兆芯集成", "博汇纸业", "亨通光电", "中旗新材", "振石股份",
+      "洁美科技", "季丰电子", "江丰电子", "东芯股份", "欣旺达", "沪硅产业",
+      "华虹宏力", "恒力石化", "沐曦股份", "天合光能", "思特威", "五洲特纸",
+      "华友钴业", "豪威集团", "应流股份", "新凤鸣", "华培动力", "桐昆股份",
+      "上工申贝", "安徽合力", "先导基电", "华谊集团", "三一重工", "建发致新",
+      "精测电子", "鼎捷数智", "开山股份", "荣盛石化", "万马股份", "东华能源",
+      "万丰奥威", "国轩高科", "浪潮信息", "华东医药", "上峰材料", "徐工机械",
+      "东方盛虹", "荃信生物-B", "华虹宏力"
+    ].filter((v, i, a) => a.indexOf(v) === i); // 去重
+
+    const container = document.getElementById('radar-container');
+    const companyLayer = document.getElementById('company-layer');
+    const sweepGlow = document.getElementById('sweep-glow');
+    const sweepLine = document.getElementById('sweep-line');
+    const pulseCountEl = document.getElementById('pulse-count');
+
+    let angle = 0;
+    const scanSpeed = 0.7; // 每秒转多少度（约 5 秒/圈）
+    const items = [];
+
+    function placeCompanies() {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      const cx = w / 2;
+      const cy = h / 2;
+      const radarRadius = Math.min(w, h) * 0.35;
+      const safeMargin = 55;
+
+      // 安全区域：状态文字 + 两个角标，公司名称不能进入
+      const safeRects = [
+        { x: 18, y: 22, w: 275, h: 82 },   // 状态文字
+        { x: 16, y: 16, w: 40, h: 40 },    // 左上角标
+        { x: w - 54, y: h - 54, w: 40, h: 40 } // 右下角标
+      ];
+
+      function inSafeRect(x, y) {
+        return safeRects.some(r =>
+          x >= r.x - 24 && x <= r.x + r.w + 24 &&
+          y >= r.y - 12 && y <= r.y + r.h + 12
+        );
+      }
+
+      function peerMinDist(x, y) {
+        let min = Infinity;
+        for (const item of items) {
+          const dx = item.x - x;
+          const dy = item.y - y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < min) min = d;
+        }
+        return min;
+      }
+
+      companies.forEach(name => {
+        let best = null;
+        let bestScore = -Infinity;
+
+        for (let i = 0; i < 90; i++) {
+          const x = safeMargin + Math.random() * (w - safeMargin * 2);
+          const y = safeMargin + Math.random() * (h - safeMargin * 2);
+          const dx = x - cx;
+          const dy = y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // 不能太靠近雷达中心
+          if (dist < radarRadius * 0.18) continue;
+          // 不能进入安全区域
+          if (inSafeRect(x, y)) continue;
+
+          const minPeer = peerMinDist(x, y);
+          const margin = Math.min(x - safeMargin, w - x - safeMargin, y - safeMargin, h - y - safeMargin);
+          const score = minPeer * 1.5 + margin * 0.25;
+
+          // 找到满足间距要求的直接采用
+          if (minPeer >= 64 && margin > 20) {
+            best = { x, y, dist };
+            break;
+          }
+
+          if (score > bestScore) {
+            bestScore = score;
+            best = { x, y, dist };
+          }
+        }
+
+        const x = best ? best.x : safeMargin + Math.random() * (w - safeMargin * 2);
+        const y = best ? best.y : safeMargin + Math.random() * (h - safeMargin * 2);
+        const dist = best ? best.dist : Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+
+        const el = document.createElement('div');
+        el.className = 'company-name';
+        el.textContent = name;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        companyLayer.appendChild(el);
+
+        items.push({
+          el,
+          x,
+          y,
+          active: false,
+          lastTrigger: 0,
+          dist
+        });
+      });
+    }
+
+    function updateScan(timestamp) {
+      // 角度递增
+      angle = (angle + scanSpeed) % 360;
+      sweepGlow.style.transform = `rotate(${angle}deg)`;
+      sweepLine.style.transform = `rotate(${angle}deg)`;
+
+      const rect = container.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const beamRad = angle * Math.PI / 180;
+      const cosB = Math.cos(beamRad);
+      const sinB = Math.sin(beamRad);
+
+      let activeNow = 0;
+      const now = Date.now();
+
+      items.forEach(item => {
+        const dx = item.x - cx;
+        const dy = item.y - cy;
+        let itemAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+        if (itemAngle < 0) itemAngle += 360;
+
+        let diff = Math.abs(itemAngle - angle);
+        if (diff > 180) diff = 360 - diff;
+
+        // 计算名字到扫描线的垂直距离，避免远处公司被误触发
+        // 点到射线起点的距离在射线方向上的投影
+        const proj = dx * cosB + dy * sinB;
+        const perpDist = Math.abs(dx * (-sinB) + dy * cosB);
+
+        // 只在扫描线前方一定角度和距离窗口内触发
+        if (diff < 16 && proj > 0 && perpDist < 90) {
+          if (now - item.lastTrigger > 2800) {
+            item.lastTrigger = now;
+            item.el.classList.add('active');
+            setTimeout(() => {
+              item.el.classList.remove('active');
+            }, 2400);
+          }
+        }
+
+        if (item.el.classList.contains('active')) {
+          activeNow++;
+        }
+      });
+
+      pulseCountEl.textContent = `${activeNow} ACTIVE PULSES DETECTED`;
+
+      requestAnimationFrame(updateScan);
+    }
+
+    placeCompanies();
+    requestAnimationFrame(updateScan);
+
+    // 窗口大小变化时重新布局
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        companyLayer.innerHTML = '';
+        items.length = 0;
+        placeCompanies();
+      }, 250);
+    });
+  </script>
+</body>
+</html>

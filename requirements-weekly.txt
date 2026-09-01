@@ -1,0 +1,5 @@
+mootdx>=0.10
+pandas
+requests
+stockstats
+feedparser

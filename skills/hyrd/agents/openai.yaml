@@ -1,0 +1,4 @@
+interface:
+  display_name: "行业热点"
+  short_description: "抓取近一周六大行业券商周报并整理客观热点信息"
+  default_prompt: "使用 $hyrd，抓取近一周六大行业券商周报，提炼客观行业热点并输出 Markdown。"
