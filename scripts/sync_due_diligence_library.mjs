@@ -64,13 +64,37 @@ async function inventory() {
   return documents.sort((a, b) => a.file.localeCompare(b.file, "zh-CN"));
 }
 
-const documents = await inventory();
+function sameDocument(previous, current) {
+  return ["title", "file", "type", "industry", "size", "sha256"]
+    .every(field => previous?.[field] === current?.[field]);
+}
+
+async function readCurrentManifest() {
+  try {
+    return JSON.parse(await readFile(outputPath, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+const current = await readCurrentManifest();
+const discoveredDocuments = await inventory();
+const previousByFile = new Map((current?.documents || []).map(document => [document.file, document]));
+const documents = discoveredDocuments.map(document => {
+  const previous = previousByFile.get(document.file);
+  // Checkout operations do not preserve filesystem mtime. Keep the committed
+  // display date for unchanged PDFs and refresh it only for real file changes.
+  return previous && sameDocument(previous, document) && previous.modifiedAt
+    ? { ...document, modifiedAt: previous.modifiedAt }
+    : document;
+});
 const syncDate = dateArg || formatDate(new Date());
 if (!/^\d{4}\.\d{2}\.\d{2}$/.test(syncDate)) throw new Error("更新日期必须为 YYYY.MM.DD");
 const next = { syncedAt: syncDate, documentCount: documents.length, documents };
 
 if (checkOnly) {
-  const current = JSON.parse(await readFile(outputPath, "utf8"));
+  if (!current) throw new Error("缺少尽调百宝箱清单，请运行 npm run due-diligence:sync");
   const comparable = { documentCount: current.documentCount, documents: current.documents };
   const expected = { documentCount: next.documentCount, documents: next.documents };
   if (JSON.stringify(comparable) !== JSON.stringify(expected)) throw new Error("/pdf 目录已变化，请运行 npm run due-diligence:sync 更新尽调百宝箱清单");
